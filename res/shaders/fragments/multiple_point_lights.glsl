@@ -53,7 +53,8 @@ vec3 SampleEnvironmentMap(vec3 normal) {
 // @param viewDir   Direction between camera and fragment
 // @param Light     The light to caluclate the contribution for
 // @param shininess The specular power for the fragment, between 0 and 1
-vec3 CalcPointLightContribution(vec3 worldPos, vec3 normal, vec3 viewDir, Light light, float shininess) {
+
+vec3 CalcPointLightContribution(vec3 worldPos, vec3 normal, vec3 viewDir, Light light, float shininess) { //, int doSpecRamp, sampler1D specRamp
 	// Get the direction to the light in world space
 	vec3 toLight = light.Position.xyz - worldPos;
 	// Get distance between fragment and light
@@ -81,6 +82,46 @@ vec3 CalcPointLightContribution(vec3 worldPos, vec3 normal, vec3 viewDir, Light 
 	return (diffuseOut + specularOut) * attenuation;
 }
 
+vec3 CalcPointLightContributionWithSpecRamp(vec3 worldPos, vec3 normal, vec3 viewDir, Light light, float shininess, int doSpecRamp, sampler1D specRamp, int doDiffRamp, sampler1D diffRamp) {
+	// Get the direction to the light in world space
+	vec3 toLight = light.Position.xyz - worldPos;
+	// Get distance between fragment and light
+	float dist = length(toLight);
+	// Normalize toLight for other calculations
+	toLight = normalize(toLight);
+
+	// Halfway vector between light normal and direction to camera
+	vec3 halfDir     = normalize(toLight + viewDir);
+
+	// Calculate our specular power
+	float specPower  = pow(max(dot(normal, halfDir), 0.0), pow(256, shininess));
+	// Calculate specular color
+	vec3 specularOut = specPower * light.ColorAttenuation.rgb;
+	
+	if(doSpecRamp >= 1){
+		specularOut.r = texture(specRamp, specularOut.r).r;
+		specularOut.g = texture(specRamp, specularOut.g).g;
+		specularOut.b = texture(specRamp, specularOut.b).b;
+	}
+
+	// Calculate diffuse factor
+	float diffuseFactor = max(dot(normal, toLight), 0);
+	// Calculate diffuse color
+	vec3  diffuseOut = diffuseFactor * light.ColorAttenuation.rgb;
+	
+	if(doDiffRamp >= 1){
+		diffuseOut.r = texture(diffRamp, diffuseOut.r).r;
+		diffuseOut.g = texture(diffRamp, diffuseOut.g).g;
+		diffuseOut.b = texture(diffRamp, diffuseOut.b).b;
+	}
+
+	// We'll use a modified distance squared attenuation factor to keep it simple
+	// We add the one to prevent divide by zero errors
+	float attenuation = clamp(1.0 / (1.0 + light.ColorAttenuation.w * pow(dist, 2)), 0, 1);
+
+	return (diffuseOut + specularOut) * attenuation;
+}
+
 /*
  * Calculates the lighting contribution for all lights in the scene
  * for a given fragment
@@ -88,7 +129,7 @@ vec3 CalcPointLightContribution(vec3 worldPos, vec3 normal, vec3 viewDir, Light 
  * @param normal The normalized surface normal for the fragment
  * @param camPos The camera's position in world space
 */
-vec3 CalcAllLightContribution(vec3 worldPos, vec3 normal, vec3 camPos, float shininess) {
+vec3 CalcAllLightContribution(vec3 worldPos, vec3 normal, vec3 camPos, float shininess) { //, int doSpecRamp, sampler1D specRamp
     // Will accumulate the contributions of all lights on this fragment
 	vec3 lightAccumulation = AmbientColAndNumLights.rgb;
 
@@ -98,7 +139,23 @@ vec3 CalcAllLightContribution(vec3 worldPos, vec3 normal, vec3 camPos, float shi
 	// Iterate over all lights
 	for(int ix = 0; ix < AmbientColAndNumLights.w && ix < MAX_LIGHTS; ix++) {
 		// Additive lighting model
-		lightAccumulation += CalcPointLightContribution(worldPos, normal, viewDir, Lights[ix], shininess);
+		lightAccumulation += CalcPointLightContribution(worldPos, normal, viewDir, Lights[ix], shininess); //, doSpecRamp, specRamp
+	}
+
+	return lightAccumulation;
+}
+
+vec3 CalcPointLightContributionWithSpecRamp(vec3 worldPos, vec3 normal, vec3 camPos, float shininess, int doSpecRamp, sampler1D specRamp, int doDiffRamp, sampler1D diffRamp) {
+    // Will accumulate the contributions of all lights on this fragment
+	vec3 lightAccumulation = AmbientColAndNumLights.rgb;
+
+	// Direction between camera and fragment will be shared for all lights
+	vec3 viewDir  = normalize(camPos - worldPos);
+	
+	// Iterate over all lights
+	for(int ix = 0; ix < AmbientColAndNumLights.w && ix < MAX_LIGHTS; ix++) {
+		// Additive lighting model
+		lightAccumulation += CalcPointLightContributionWithSpecRamp(worldPos, normal, viewDir, Lights[ix], shininess, doSpecRamp, specRamp, doDiffRamp, diffRamp);
 	}
 
 	return lightAccumulation;

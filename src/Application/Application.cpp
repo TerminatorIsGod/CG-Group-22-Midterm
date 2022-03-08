@@ -44,6 +44,9 @@
 #include "Gameplay/Components/ParticleSystem.h"
 #include "Gameplay/Components/Light.h"
 
+#include "Gameplay/Components/GoombaEnemy.h"
+#include "Gameplay/Components/DayAndNight.h"
+
 // GUI
 #include "Gameplay/Components/GUI/RectTransform.h"
 #include "Gameplay/Components/GUI/GuiPanel.h"
@@ -58,6 +61,7 @@
 #include "Layers/ImGuiDebugLayer.h"
 #include "Layers/InstancedRenderingTestLayer.h"
 #include "Layers/ParticleLayer.h"
+#include <Gameplay/Components/EndFlag.h>
 
 Application* Application::_singleton = nullptr;
 std::string Application::_applicationName = "INFR-2350U - DEMO";
@@ -141,6 +145,10 @@ void Application::SaveSettings()
 	}
 
 	FileHelpers::WriteContentsToFile(settingsPath.string(), _appSettings.dump(1, '\t'));
+}
+
+void Application::RestartScene(std::string name) {
+	LoadScene(name);
 }
 
 void Application::_Run()
@@ -272,6 +280,10 @@ void Application::_RegisterClasses()
 	ComponentManager::RegisterType<GuiText>();
 	ComponentManager::RegisterType<ParticleSystem>();
 	ComponentManager::RegisterType<Light>();
+
+	ComponentManager::RegisterType<GoombaEnemy>();
+	ComponentManager::RegisterType<DayAndNight>();
+	ComponentManager::RegisterType<EndFlag>();
 }
 
 void Application::_Load() {

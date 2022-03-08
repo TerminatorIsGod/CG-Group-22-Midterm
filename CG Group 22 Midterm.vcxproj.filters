@@ -108,6 +108,12 @@
     <ClInclude Include="src\Gameplay\Components\ComponentManager.h">
       <Filter>Gameplay\Components</Filter>
     </ClInclude>
+    <ClInclude Include="src\Gameplay\Components\DayAndNight.h">
+      <Filter>Gameplay\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gameplay\Components\EndFlag.h">
+      <Filter>Gameplay\Components</Filter>
+    </ClInclude>
     <ClInclude Include="src\Gameplay\Components\GUI\GuiPanel.h">
       <Filter>Gameplay\Components\GUI</Filter>
     </ClInclude>
@@ -116,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="src\Gameplay\Components\GUI\RectTransform.h">
       <Filter>Gameplay\Components\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gameplay\Components\GoombaEnemy.h">
+      <Filter>Gameplay\Components</Filter>
     </ClInclude>
     <ClInclude Include="src\Gameplay\Components\IComponent.h">
       <Filter>Gameplay\Components</Filter>
@@ -359,6 +368,12 @@
     <ClCompile Include="src\Gameplay\Components\Camera.cpp">
       <Filter>Gameplay\Components</Filter>
     </ClCompile>
+    <ClCompile Include="src\Gameplay\Components\DayAndNight.cpp">
+      <Filter>Gameplay\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\Components\EndFlag.cpp">
+      <Filter>Gameplay\Components</Filter>
+    </ClCompile>
     <ClCompile Include="src\Gameplay\Components\GUI\GuiPanel.cpp">
       <Filter>Gameplay\Components\GUI</Filter>
     </ClCompile>
@@ -367,6 +382,9 @@
     </ClCompile>
     <ClCompile Include="src\Gameplay\Components\GUI\RectTransform.cpp">
       <Filter>Gameplay\Components\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gameplay\Components\GoombaEnemy.cpp">
+      <Filter>Gameplay\Components</Filter>
     </ClCompile>
     <ClCompile Include="src\Gameplay\Components\IComponent.cpp">
       <Filter>Gameplay\Components</Filter>

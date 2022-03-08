@@ -50,6 +50,8 @@ public:
 	 */
 	void ResizeWindow(const glm::ivec2& newSize);
 
+	void RestartScene(std::string name);
+
 	/**
 	 * Gets the viewport that the game will appear in on the screen. For non-editor versions, this should be the entire screen
 	 * @returns The bounds for the viewport, in screenspace, formatted as { x, y, width, height }
